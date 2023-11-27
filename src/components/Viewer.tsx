@@ -15,8 +15,8 @@ export function Viewer({
   activeEdgeId,
   setActiveEdgeId,
 }: ChildProps) {
-  const activeNodeIdRef = useRef<string>() // for dragging
-
+  // for dragging
+  const activeNodeIdRef = useRef<string>()
   const mouseDownPosition = useRef<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -82,9 +82,23 @@ export function Viewer({
           setActiveEdgeId(undefined)
         }
         if (activeNodeId) {
+          // remove node
           setNodes((prev) => {
             const { [activeNodeId]: _, ...rest } = prev
             return rest
+          })
+          // remove every edge connected to this node
+          setEdges((prev) => {
+            const newEdges = Object.values(prev).filter(
+              (edge) =>
+                edge.sourceId !== activeNodeId && edge.targetId !== activeNodeId
+            )
+            return newEdges.reduce((acc, edge) => {
+              return {
+                ...acc,
+                [edge.id]: edge,
+              }
+            }, {})
           })
           setActiveNodeId(undefined)
         }
@@ -107,19 +121,19 @@ export function Viewer({
           height={svgRef.current?.clientHeight}
           // preserveAspectRatio='none'
         >
-          {/* <defs>
-          <marker
-            id='arrow'
-            viewBox='0 0 10 10'
-            refX='5'
-            refY='5'
-            markerWidth='6'
-            markerHeight='6'
-            orient='auto-start-reverse'
-          >
-            <path d='M 0 0 L 10 5 L 0 10 z' />
-          </marker>
-        </defs> */}
+          <defs>
+            <marker
+              id='arrow'
+              viewBox='0 0 10 10'
+              refX='5'
+              refY='5'
+              markerWidth='6'
+              markerHeight='6'
+              orient='auto-start-reverse'
+            >
+              <path d='M 0 0 L 10 5 L 0 10 z' />
+            </marker>
+          </defs>
 
           {Object.values(edges).map((edge) => {
             const { sourceId, targetId } = edge

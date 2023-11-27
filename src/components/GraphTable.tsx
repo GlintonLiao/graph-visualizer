@@ -19,7 +19,16 @@ export function GraphTable({
       title: 'Node',
       dataIndex: 'name',
       key: 'name',
-      render: (text: string) => <a>{text}</a>,
+      render: (text: string, record: Node) => (
+        <a
+          onClick={() => {
+            setActiveNodeId(record.id)
+            setActiveEdgeId(undefined)
+          }}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: 'Options',
@@ -54,14 +63,15 @@ export function GraphTable({
   ] as ColumnProps<any>[]
 
   return (
-    <div className='w-1/5 h-full p-3'>
+    <div className='w-1/5 h-full p-3 overflow-scroll'>
       <Table
         title={() => <div className='font-bold text-lg'>Adjacency Table</div>}
         dataSource={Object.values(nodes)}
         rowKey={(record) => record.id}
         size='small'
         columns={columns}
-        className='h-full shadow-lg rounded-lg overflow-hidden p-2 pt-1 border'
+        pagination={false}
+        className='h-full shadow-lg rounded-lg p-2 pt-1 border '
         expandable={{
           expandedRowRender: (record: Node) => {
             const edgesForNode = Object.values(edges).filter(
@@ -76,10 +86,15 @@ export function GraphTable({
                 rowKey={(record) => record.id}
                 columns={[
                   {
-                    title: 'Nodes',
-                    key: 'nodes',
-                    render: (value, record: Edge) => (
-                      <a>
+                    title: 'Edge',
+                    key: 'edge',
+                    render: (_, record: Edge) => (
+                      <a
+                        onClick={() => {
+                          setActiveNodeId(undefined)
+                          setActiveEdgeId(record.id)
+                        }}
+                      >
                         {nodes[record.sourceId].name} -{' '}
                         {nodes[record.targetId].name}
                       </a>
@@ -89,7 +104,7 @@ export function GraphTable({
                     title: 'Value',
                     dataIndex: 'value',
                     key: 'value',
-                    render: (text) => <a>{text}</a>,
+                    render: (text) => <span>{text}</span>,
                   },
                 ]}
               />
