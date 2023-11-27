@@ -3,7 +3,7 @@
 import uniqid from 'uniqid'
 import { ChildProps, Node } from '@/app/page'
 import { Button, Dropdown, InputNumber, MenuProps } from 'antd'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 
 export function Viewer({
   nodes,
@@ -67,6 +67,42 @@ export function Viewer({
     }
   }
 
+  // for generating new node position
+  const generatePosition = () => {
+    // center
+    if (Object.keys(nodes).length === 0) {
+      return {
+        x: svgRef.current!.clientWidth / 2,
+        y: svgRef.current!.clientHeight / 2,
+      }
+    } else {
+      // get the last node
+      const lastNode = Object.values(nodes).at(-1)!
+      const { x, y } = lastNode
+      // generate random dx and dy right next to the last node
+      const dx = (Math.random() - 0.5) * 700
+      const dy = (Math.random() - 0.5) * 700
+      return {
+        x: x + dx,
+        y: y + dy,
+      }
+    }
+  }
+
+  const generateNode = () => {
+    const { x, y } = generatePosition()
+    const node = {
+      id: uniqid(),
+      name: `${Number(Object.values(nodes).at(-1)?.name ?? 0) + 1}`,
+      x,
+      y,
+    }
+    setNodes((prev) => ({
+      ...prev,
+      [node.id]: node,
+    }))
+  }
+
   const svgRef = useRef<SVGSVGElement>(null)
 
   const menuItems: MenuProps['items'] = [
@@ -104,6 +140,11 @@ export function Viewer({
         }
       },
     },
+    {
+      key: 'add',
+      label: 'Add Node',
+      onClick: generateNode,
+    }
   ]
 
   return (
@@ -285,21 +326,7 @@ export function Viewer({
             )
           })}
         </svg>
-        <Button
-          className='absolute bottom-3 right-3'
-          onClick={() => {
-            const node = {
-              id: uniqid(),
-              name: `${Number(Object.values(nodes).at(-1)?.name ?? 0) + 1}`,
-              x: Math.random() * svgRef.current!.clientWidth,
-              y: Math.random() * svgRef.current!.clientHeight,
-            }
-            setNodes((prev) => ({
-              ...prev,
-              [node.id]: node,
-            }))
-          }}
-        >
+        <Button className='absolute bottom-3 right-3' onClick={generateNode}>
           Add Node
         </Button>
       </div>

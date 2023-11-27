@@ -1,8 +1,9 @@
 'use client'
 
-import { ChildProps, Edge, Node } from '@/app/page'
-import { Button, Table } from 'antd'
+import { ChildProps, Edge, Node, OperationMode } from '@/app/page'
+import { Button, Select, Table } from 'antd'
 import { ColumnProps } from 'antd/es/table'
+import { useState } from 'react'
 
 export function GraphTable({
   nodes,
@@ -13,7 +14,12 @@ export function GraphTable({
   setActiveNodeId,
   activeEdgeId,
   setActiveEdgeId,
+  mode,
+  setMode,
+  speed,
+  setSpeed,
 }: ChildProps) {
+
   const columns = [
     {
       title: 'Node',
@@ -35,17 +41,17 @@ export function GraphTable({
       width: 100,
       key: 'options',
       align: 'center',
-      render: (text: string, record: any) => (
+      render: (text: string, record: Node) => (
         <Button
           onClick={() => {
             setNodes((prev) => {
-              const { [record.key]: omit, ...rest } = prev
+              const { [record.id]: _, ...rest } = prev
               return rest
             })
             setEdges((prev) => {
               const newEdges = Object.values(prev).filter(
                 (edge) =>
-                  edge.sourceId !== record.key && edge.targetId !== record.key
+                  edge.sourceId !== record.id && edge.targetId !== record.id
               )
               return newEdges.reduce((acc, edge) => {
                 return {
@@ -63,7 +69,7 @@ export function GraphTable({
   ] as ColumnProps<any>[]
 
   return (
-    <div className='w-1/5 h-full p-3 overflow-scroll'>
+    <div className='w-1/4 h-full p-3 flex flex-col gap-3'>
       <Table
         title={() => <div className='font-bold text-lg'>Adjacency Table</div>}
         dataSource={Object.values(nodes)}
@@ -71,7 +77,7 @@ export function GraphTable({
         size='small'
         columns={columns}
         pagination={false}
-        className='h-full shadow-lg rounded-lg p-2 pt-1 border '
+        className='flex-1 shadow-lg rounded-lg p-2 pt-1 border overflow-scroll'
         expandable={{
           expandedRowRender: (record: Node) => {
             const edgesForNode = Object.values(edges).filter(
@@ -119,6 +125,72 @@ export function GraphTable({
           },
         }}
       />
+      <div className='shadow-lg rounded-lg p-3.5 border'>
+        <div className='font-bold text-lg'>Calculation</div>
+        <div className='flex w-full justify-center items-center gap-2 mt-2'>
+          <div className='mr-2.5'>Mode</div>
+          <Select
+            className='flex-1'
+            value={mode}
+            onChange={(value) => {
+              setMode(value)
+            }}
+            options={Object.keys(OperationMode).map((mode) => {
+              return {
+                // SHORTEST_PATH -> Shortest Path
+                label: mode
+                  .toString()
+                  .toLowerCase()
+                  .split('_')
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' '),
+                value: mode,
+              }
+            })}
+          />
+        </div>
+        <div className='flex w-full justify-center items-center gap-2 mt-2'>
+          <div className='mr-1'>Speed</div>
+          <Select
+            className='flex-1'
+            value={speed}
+            onChange={(value) => {
+              setSpeed(value)
+            }}
+            options={[
+              {
+                label: '0.1s',
+                value: 0.1,
+              },
+              {
+                label: '0.5s',
+                value: 0.5,
+              },
+              {
+                label: '1s',
+                value: 1,
+              },
+              {
+                label: '2s',
+                value: 2,
+              },
+              {
+                label: '5s',
+                value: 5,
+              },
+            ]}
+          />
+          <Button
+            type='primary'
+            className='w-1/2'
+            onClick={() => {
+              console.log('Shortest Path')
+            }}
+          >
+            Run
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
