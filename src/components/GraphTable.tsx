@@ -18,6 +18,7 @@ export function GraphTable({
   setMode,
   speed,
   setSpeed,
+  runShortestPath,
 }: ChildProps) {
 
   const columns = [
@@ -183,9 +184,7 @@ export function GraphTable({
           <Button
             type='primary'
             className='w-1/2'
-            onClick={() => {
-              console.log('Shortest Path')
-            }}
+            onClick={runShortestPath}
           >
             Run
           </Button>

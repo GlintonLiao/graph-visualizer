@@ -144,7 +144,7 @@ export function Viewer({
       key: 'add',
       label: 'Add Node',
       onClick: generateNode,
-    }
+    },
   ]
 
   return (
@@ -191,7 +191,13 @@ export function Viewer({
                   y1={y1}
                   x2={x2}
                   y2={y2}
-                  stroke={activeEdgeId === edge.id ? 'yellow' : 'black'}
+                  stroke={
+                    edge.selected
+                      ? 'red'
+                      : activeEdgeId === edge.id
+                      ? 'yellow'
+                      : 'black'
+                  }
                   strokeWidth='2'
                   markerEnd='url(#arrow)'
                   onClick={() => {
@@ -296,7 +302,7 @@ export function Viewer({
                   cx={x}
                   cy={y}
                   r='20'
-                  stroke='black'
+                  stroke={node.selected ? 'red' : 'black'}
                   fill='white'
                   strokeWidth='2'
                   className='group-hover:stroke-[0.7px] group-hover:stroke-blue-400'
