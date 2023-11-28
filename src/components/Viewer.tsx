@@ -14,6 +14,8 @@ export function Viewer({
   setActiveNodeId,
   activeEdgeId,
   setActiveEdgeId,
+  totalDistance,
+  setTotalDistance,
 }: ChildProps) {
   // for dragging
   const activeNodeIdRef = useRef<string>()
@@ -332,6 +334,11 @@ export function Viewer({
             )
           })}
         </svg>
+        {totalDistance > 0 && (
+          <div className='absolute top-3 right-3'>
+            Total Distance: {totalDistance}
+          </div>
+        )}
         <Button className='absolute bottom-3 right-3' onClick={generateNode}>
           Add Node
         </Button>

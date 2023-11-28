@@ -3,6 +3,7 @@
 import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { GraphTable } from '../components/GraphTable'
 import { Viewer } from '../components/Viewer'
+import { message } from 'antd'
 
 export interface Node {
   id: string
@@ -33,7 +34,13 @@ export interface ChildProps {
   setMode: Dispatch<SetStateAction<OperationMode>>
   speed: number
   setSpeed: Dispatch<SetStateAction<number>>
+  totalDistance: number
+  setTotalDistance: Dispatch<SetStateAction<number>>
+  canClear: boolean
+  setCanClear: Dispatch<SetStateAction<boolean>>
   runShortestPath: () => void
+  runMinimumSpanningTree: () => void
+  runCanBipartite: () => void
 }
 
 export enum OperationMode {
@@ -49,30 +56,48 @@ export default function Home() {
   const [activeEdgeId, setActiveEdgeId] = useState<string>()
   const [mode, setMode] = useState<OperationMode>(OperationMode.SHORTEST_PATH)
   const [speed, setSpeed] = useState<number>(1)
+  const [totalDistance, setTotalDistance] = useState<number>(0)
+  const [canClear, setCanClear] = useState<boolean>(false)
 
   const runShortestPath = async () => {
-    // TODO: Dijsktra's algorithm
+    if (!activeNodeId) {
+      message.warning('Please select a node as source node first')
+      setCanClear(false)
+      return
+    }
+
     const nodesMap: {
-      [key: string]: Node & { visited: boolean; distance: number; pre: string | null }
+      [key: string]: Node & {
+        visited: boolean
+        distance: number
+        pre: string | null
+      }
     } = {}
-    console.log(nodes, 'nodes');
-    
+    console.log(nodes, 'nodes')
     Object.values(nodes).forEach((node) => {
-      nodesMap[node.id] = node as Node & { visited: boolean; distance: number; pre: string | null }
+      nodesMap[node.id] = node as Node & {
+        visited: boolean
+        distance: number
+        pre: string | null
+      }
       nodesMap[node.id].visited = false
       nodesMap[node.id].distance = node.id === activeNodeId ? 0 : Infinity
       nodesMap[node.id].pre = null
     })
+
     while (true) {
-      const unvisitedNodes = Object.values(nodesMap).filter(
-        (node) => !node.visited
-      )
-      if (unvisitedNodes.length === 0) break
-      const minDistanceNode = unvisitedNodes.reduce((acc, node) =>
-        node.distance < acc.distance ? node : acc
-      , unvisitedNodes[0])
+      let minDistanceNode: any = null
+      Object.values(nodesMap).forEach((node) => {
+        if (
+          !node.visited &&
+          (minDistanceNode === null || node.distance < minDistanceNode.distance)
+        ) {
+          minDistanceNode = node
+        }
+      })
+      if (!minDistanceNode) break
       nodesMap[minDistanceNode.id].visited = true
-      console.log(minDistanceNode, 'minDistanceNode');
+      console.log(minDistanceNode, 'minDistanceNode')
       setNodes((prev) => ({
         ...prev,
         [minDistanceNode.id]: {
@@ -85,14 +110,15 @@ export default function Home() {
           edge.sourceId === minDistanceNode.id ||
           edge.targetId === minDistanceNode.id
       )
-      console.log(edgesFromMinDistanceNode, 'edgesFromMinDistanceNode');
-      
+      console.log(edgesFromMinDistanceNode, 'edgesFromMinDistanceNode')
       const selectedEdge = edgesFromMinDistanceNode.find(
         (edge) =>
-          (edge.sourceId === minDistanceNode.id && edge.targetId === minDistanceNode.pre) ||
-          (edge.targetId === minDistanceNode.id && edge.sourceId === minDistanceNode.pre)
+          (edge.sourceId === minDistanceNode.id &&
+            edge.targetId === minDistanceNode.pre) ||
+          (edge.targetId === minDistanceNode.id &&
+            edge.sourceId === minDistanceNode.pre)
       )
-      console.log(selectedEdge, 'selectedEdge');
+      console.log(selectedEdge, 'selectedEdge')
       if (selectedEdge) {
         setEdges((prev) => ({
           ...prev,
@@ -101,10 +127,14 @@ export default function Home() {
             selected: true,
           },
         }))
+        setTotalDistance((prev) => prev + selectedEdge.value)
       }
-      await new Promise((resolve) => setTimeout(resolve, 1000 / speed))
+      await new Promise((resolve) => setTimeout(resolve, 1000 * speed))
       edgesFromMinDistanceNode.forEach((edge) => {
-        const targetNode = nodesMap[edge.targetId === minDistanceNode.id ? edge.sourceId : edge.targetId]
+        const targetNode =
+          nodesMap[
+            edge.targetId === minDistanceNode.id ? edge.sourceId : edge.targetId
+          ]
         if (targetNode.distance > minDistanceNode.distance + edge.value) {
           targetNode.distance = minDistanceNode.distance + edge.value
           targetNode.pre = minDistanceNode.id
@@ -113,8 +143,104 @@ export default function Home() {
     }
   }
 
-  const runMinimumSpanningTree = () => {
+  const runMinimumSpanningTree = async () => {
     // TODO
+    const nodesMap: {
+      [key: string]: Node & {
+        visited: boolean
+        pre: string | null
+      }
+    } = {}
+
+    Object.values(nodes).forEach((node) => {
+      nodesMap[node.id] = node as Node & {
+        visited: boolean
+        pre: string | null
+      }
+      nodesMap[node.id].visited = false
+      nodesMap[node.id].pre = null
+    })
+
+    console.log(nodesMap);
+    
+    const edgesHeap: Edge[] = [...Object.values(edges)]
+    // Construct a min-heap based on the edge values
+    edgesHeap.sort((a, b) => a.value - b.value)
+
+    const selectedEdges: Edge[] = []
+
+    while (selectedEdges.length < Object.keys(nodes).length - 1) {
+      // Extract the edge with the minimum weight
+      const minEdge = edgesHeap.shift()
+
+      if (!minEdge) {
+        // No more edges in the heap
+        break
+      }
+
+      // Check if adding the edge creates a cycle
+      const sourceVisited = nodesMap[minEdge.sourceId].visited
+      const targetVisited = nodesMap[minEdge.targetId].visited
+
+      // if (sourceVisited && targetVisited) {
+      //   continue // Skip this edge to avoid a cycle
+      // }
+
+      // Mark the nodes as visited
+      nodesMap[minEdge.sourceId].visited = true
+      nodesMap[minEdge.targetId].visited = true
+
+      setNodes((prev) => ({
+        ...prev,
+        [minEdge.sourceId]: {
+          ...prev[minEdge.sourceId],
+          selected: true,
+        },
+        [minEdge.targetId]: {
+          ...prev[minEdge.targetId],
+          selected: true,
+        },
+      }))
+
+      // Update the MST
+      selectedEdges.push(minEdge)
+
+      // TODO: Update your React state or perform any other required actions here
+      console.log(`Selected Edge: ${minEdge.sourceId} - ${minEdge.targetId}`)
+      setEdges((prev) => ({
+        ...prev,
+        [minEdge.id]: {
+          ...prev[minEdge.id],
+          selected: true,
+        },
+      }))
+
+      await new Promise((resolve) => setTimeout(resolve, 1000 * speed))
+
+      // Add the edges connected to the newly added node to the heap
+      const adjacentEdges = Object.values(edges).filter(
+        (edge) =>
+          edge.sourceId === minEdge.sourceId ||
+          edge.targetId === minEdge.sourceId ||
+          edge.sourceId === minEdge.targetId ||
+          edge.targetId === minEdge.targetId
+      )
+
+      for (const adjacentEdge of adjacentEdges) {
+        if (
+          !nodesMap[adjacentEdge.sourceId].visited ||
+          !nodesMap[adjacentEdge.targetId].visited
+        ) {
+          edgesHeap.push(adjacentEdge)
+        }
+      }
+
+      // Re-heapify
+      edgesHeap.sort((a, b) => a.value - b.value)
+    }
+
+    // TODO: Update your React state or perform any other required actions here
+    console.log('Selected Edges for Minimum Spanning Tree:', selectedEdges)
   }
 
   const runCanBipartite = () => {
@@ -134,7 +260,13 @@ export default function Home() {
     setMode,
     speed,
     setSpeed,
+    totalDistance,
+    setTotalDistance,
+    canClear,
+    setCanClear,
     runShortestPath,
+    runMinimumSpanningTree,
+    runCanBipartite,
   }
 
   return (

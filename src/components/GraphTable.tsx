@@ -18,9 +18,14 @@ export function GraphTable({
   setMode,
   speed,
   setSpeed,
+  canClear,
+  setCanClear,
+  totalDistance,
+  setTotalDistance,
   runShortestPath,
+  runMinimumSpanningTree,
+  runCanBipartite,
 }: ChildProps) {
-
   const columns = [
     {
       title: 'Node',
@@ -68,6 +73,23 @@ export function GraphTable({
       ),
     },
   ] as ColumnProps<any>[]
+
+  const clearPaths = () => {
+    setNodes((prev) => {
+      Object.values(prev).forEach((node) => {
+        node.selected = false
+      })
+      return prev
+    })
+    setEdges((prev) => {
+      Object.values(prev).forEach((edge) => {
+        edge.selected = false
+      })
+      return prev
+    })
+    setTotalDistance(0)
+    setCanClear(false)
+  }
 
   return (
     <div className='w-1/4 h-full p-3 flex flex-col gap-3'>
@@ -135,6 +157,7 @@ export function GraphTable({
             value={mode}
             onChange={(value) => {
               setMode(value)
+              clearPaths()
             }}
             options={Object.keys(OperationMode).map((mode) => {
               return {
@@ -181,13 +204,37 @@ export function GraphTable({
               },
             ]}
           />
-          <Button
-            type='primary'
-            className='w-1/2'
-            onClick={runShortestPath}
-          >
-            Run
-          </Button>
+          {canClear ? (
+            <Button
+              type='primary'
+              danger
+              className='w-1/2'
+              onClick={clearPaths}
+            >
+              Clear
+            </Button>
+          ) : (
+            <Button
+              type='primary'
+              className='w-1/2'
+              onClick={() => {
+                setCanClear(true)
+                switch (mode) {
+                  case OperationMode.SHORTEST_PATH:
+                    runShortestPath()
+                    break
+                  case OperationMode.MINIMUM_SPANNING_TREE:
+                    runMinimumSpanningTree()
+                    break
+                  case OperationMode.CAN_BIPARTITE:
+                    runCanBipartite()
+                    break
+                }
+              }}
+            >
+              Run
+            </Button>
+          )}
         </div>
       </div>
     </div>
