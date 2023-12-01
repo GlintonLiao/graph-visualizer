@@ -1,8 +1,9 @@
 'use client'
-
 import { ChildProps, Edge, Node, OperationMode } from '@/app/page'
-import { Button, Select, Table } from 'antd'
+import { Button, Popover, Select, Table } from 'antd'
 import { ColumnProps } from 'antd/es/table'
+import Image from 'next/image'
+import GuideIcon from '@/icons/guide.svg'
 import { useState } from 'react'
 
 export function GraphTable({
@@ -149,7 +150,56 @@ export function GraphTable({
         }}
       />
       <div className='shadow-lg rounded-lg p-3.5 border'>
-        <div className='font-bold text-lg'>Calculation</div>
+        <div className='flex justify-between items-center'>
+          <div className='font-bold text-lg'>Calculation</div>
+          <Popover
+            trigger={['click']}
+            content={
+              <div className='p-1.5 flex flex-col gap-1 w-80 break-words'>
+                <div className='font-bold'>User Guide:</div>
+                <div className='mt-0.5'>
+                  User can select the mode of operation, the speed of the
+                  animation, and the source node.
+                </div>
+                <div className='mt-0.5'>
+                  The mode of operation can be one of the following:
+                  <ul className='list-disc list-inside'>
+                    <li>Shortest Path</li>
+                    <li>Minimum Spanning Tree</li>
+                  </ul>
+                </div>
+                <div className='mt-0.5'>
+                  The speed of the animation is from 0.1s to 5s. This parameter
+                  means the time interval between each step of the animation.
+                </div>
+                <div className='mt-0.5'>
+                  <span className='font-semibold'>Shortest Path Guide:</span>
+                  <ol className='list-decimal	list-inside'>
+                    <li>Click on the source node</li>
+                    <li>Click on the Run button</li>
+                    <li>Click on the Clear button to clear the result</li>
+                  </ol>
+                </div>
+                <div className='mt-0.5'>
+                  <span className='font-semibold'>
+                    Minimum Spanning Tree Guide:
+                  </span>
+
+                  <ol className='list-decimal list-inside'>
+                    <li>Click on the Run button</li>
+                    <li>Click on the Clear button to clear the result</li>
+                  </ol>
+                </div>
+              </div>
+            }
+          >
+            <Image
+              src={GuideIcon}
+              className='w-5 h-5 opacity-70 cursor-pointer'
+              alt='guide'
+            />
+          </Popover>
+        </div>
         <div className='flex w-full justify-center items-center gap-2 mt-2'>
           <div className='mr-2.5'>Mode</div>
           <Select

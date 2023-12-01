@@ -228,8 +228,7 @@ export default function Home() {
 
       for (const adjacentEdge of adjacentEdges) {
         if (
-          !nodesMap[adjacentEdge.sourceId].visited ||
-          !nodesMap[adjacentEdge.targetId].visited
+          !adjacentEdge.selected
         ) {
           edgesHeap.push(adjacentEdge)
         }

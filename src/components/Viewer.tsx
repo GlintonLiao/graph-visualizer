@@ -2,6 +2,8 @@
 
 import uniqid from 'uniqid'
 import { ChildProps, Node } from '@/app/page'
+import Image from 'next/image'
+import GithubIcon from '@/icons/github.svg'
 import { Button, Dropdown, InputNumber, MenuProps } from 'antd'
 import { useRef } from 'react'
 
@@ -339,9 +341,23 @@ export function Viewer({
             Total Distance: {totalDistance}
           </div>
         )}
-        <Button className='absolute bottom-3 right-3' onClick={generateNode}>
-          Add Node
-        </Button>
+        <div className='absolute bottom-3 right-3 flex gap-2'>
+          <Button onClick={generateNode}>
+            Add Node
+          </Button>
+          <Button
+            className='w-9 p-0 flex justify-center items-center'
+            onClick={() => {
+              window.open('https://github.com/GlintonLiao/graph-visualizer')
+            }}
+          >
+            <Image
+              src={GithubIcon}
+              alt='github'
+              className='w-5 h-5 opacity-70'
+            />
+          </Button>
+        </div>
       </div>
     </Dropdown>
   )
