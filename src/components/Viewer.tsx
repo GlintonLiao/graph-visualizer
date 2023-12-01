@@ -26,6 +26,11 @@ export function Viewer({
     y: 0,
   })
 
+  const contextMouseDownPosition = useRef<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  })
+
   const bindMoveEvent = (fn: (e: MouseEvent) => void) => {
     window.addEventListener('mousemove', fn)
     const cancelFn = () => {
@@ -73,6 +78,15 @@ export function Viewer({
 
   // for generating new node position
   const generatePosition = () => {
+    if (
+      contextMouseDownPosition.current.x !== 0 &&
+      contextMouseDownPosition.current.y !== 0
+    ) {
+      return {
+        x: contextMouseDownPosition.current.x,
+        y: contextMouseDownPosition.current.y,
+      }
+    }
     // center
     if (Object.keys(nodes).length === 0) {
       return {
@@ -84,8 +98,8 @@ export function Viewer({
       const lastNode = Object.values(nodes).at(-1)!
       const { x, y } = lastNode
       // generate random dx and dy right next to the last node
-      const dx = (Math.random() - 0.5) * 700
-      const dy = (Math.random() - 0.5) * 700
+      const dx = (Math.random() - 0.5) * 300
+      const dy = (Math.random() - 0.5) * 300
       return {
         x: x + dx,
         y: y + dy,
@@ -105,6 +119,10 @@ export function Viewer({
       ...prev,
       [node.id]: node,
     }))
+    contextMouseDownPosition.current = {
+      x: 0,
+      y: 0,
+    }
   }
 
   const svgRef = useRef<SVGSVGElement>(null)
@@ -158,7 +176,16 @@ export function Viewer({
         items: menuItems,
       }}
     >
-      <div className='flex-1 h-full relative'>
+      <div
+        className='flex-1 h-full relative'
+        onContextMenu={(e) => {
+          e.preventDefault()
+          contextMouseDownPosition.current = {
+            x: e.nativeEvent.offsetX,
+            y: e.nativeEvent.offsetY,
+          }
+        }}
+      >
         <svg
           className='h-full w-full'
           ref={svgRef}
@@ -342,9 +369,7 @@ export function Viewer({
           </div>
         )}
         <div className='absolute bottom-3 right-3 flex gap-2'>
-          <Button onClick={generateNode}>
-            Add Node
-          </Button>
+          <Button onClick={generateNode}>Add Node</Button>
           <Button
             className='w-9 p-0 flex justify-center items-center'
             onClick={() => {

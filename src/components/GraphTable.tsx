@@ -131,7 +131,7 @@ export function GraphTable({
                     ),
                   },
                   {
-                    title: 'Value',
+                    title: 'Weight',
                     dataIndex: 'value',
                     key: 'value',
                     render: (text) => <span>{text}</span>,
@@ -276,9 +276,9 @@ export function GraphTable({
                   case OperationMode.MINIMUM_SPANNING_TREE:
                     runMinimumSpanningTree()
                     break
-                  case OperationMode.CAN_BIPARTITE:
-                    runCanBipartite()
-                    break
+                  // case OperationMode.CAN_BIPARTITE:
+                    // runCanBipartite()
+                    // break
                 }
               }}
             >

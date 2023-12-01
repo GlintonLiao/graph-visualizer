@@ -46,7 +46,7 @@ export interface ChildProps {
 export enum OperationMode {
   SHORTEST_PATH = 'SHORTEST_PATH',
   MINIMUM_SPANNING_TREE = 'MINIMUM_SPANNING_TREE',
-  CAN_BIPARTITE = 'CAN_BIPARTITE',
+  // CAN_BIPARTITE = 'CAN_BIPARTITE',
 }
 
 export default function Home() {
@@ -144,7 +144,6 @@ export default function Home() {
   }
 
   const runMinimumSpanningTree = async () => {
-    // TODO
     const nodesMap: {
       [key: string]: Node & {
         visited: boolean
@@ -161,24 +160,21 @@ export default function Home() {
       nodesMap[node.id].pre = null
     })
 
-    console.log(nodesMap);
-    
+    console.log(nodesMap)
+
     const edgesHeap: Edge[] = [...Object.values(edges)]
-    // Construct a min-heap based on the edge values
+    // construct a min-heap based on the edge values
     edgesHeap.sort((a, b) => a.value - b.value)
 
     const selectedEdges: Edge[] = []
 
     while (selectedEdges.length < Object.keys(nodes).length - 1) {
-      // Extract the edge with the minimum weight
+      // extract the edge with the minimum weight
       const minEdge = edgesHeap.shift()
 
-      if (!minEdge) {
-        // No more edges in the heap
-        break
-      }
+      if (!minEdge) break
 
-      // Check if adding the edge creates a cycle
+      // check if adding the edge creates a cycle
       const sourceVisited = nodesMap[minEdge.sourceId].visited
       const targetVisited = nodesMap[minEdge.targetId].visited
 
@@ -186,7 +182,7 @@ export default function Home() {
       //   continue // Skip this edge to avoid a cycle
       // }
 
-      // Mark the nodes as visited
+      // mark the nodes as visited
       nodesMap[minEdge.sourceId].visited = true
       nodesMap[minEdge.targetId].visited = true
 
@@ -202,10 +198,9 @@ export default function Home() {
         },
       }))
 
-      // Update the MST
+      // update the MST
       selectedEdges.push(minEdge)
 
-      // TODO: Update your React state or perform any other required actions here
       console.log(`Selected Edge: ${minEdge.sourceId} - ${minEdge.targetId}`)
       setEdges((prev) => ({
         ...prev,
@@ -217,7 +212,7 @@ export default function Home() {
 
       await new Promise((resolve) => setTimeout(resolve, 1000 * speed))
 
-      // Add the edges connected to the newly added node to the heap
+      // add the edges connected to the newly added node to the heap
       const adjacentEdges = Object.values(edges).filter(
         (edge) =>
           edge.sourceId === minEdge.sourceId ||
@@ -227,19 +222,17 @@ export default function Home() {
       )
 
       for (const adjacentEdge of adjacentEdges) {
-        if (
-          !adjacentEdge.selected
-        ) {
+        if (!adjacentEdge.selected) {
           edgesHeap.push(adjacentEdge)
         }
       }
 
-      // Re-heapify
+      // re-heapify
       edgesHeap.sort((a, b) => a.value - b.value)
     }
 
-    // TODO: Update your React state or perform any other required actions here
     console.log('Selected Edges for Minimum Spanning Tree:', selectedEdges)
+    setTotalDistance(selectedEdges.reduce((acc, edge) => acc + edge.value, 0))
   }
 
   const runCanBipartite = () => {
