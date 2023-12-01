@@ -1,11 +1,11 @@
 'use client'
 
 import uniqid from 'uniqid'
-import { ChildProps, Node } from '@/app/page'
 import Image from 'next/image'
 import GithubIcon from '@/icons/github.svg'
 import { Button, Dropdown, InputNumber, MenuProps } from 'antd'
 import { useRef } from 'react'
+import { ChildProps, Node } from './types'
 
 export function Viewer({
   nodes,

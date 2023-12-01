@@ -1,5 +1,5 @@
 'use client'
-import { ChildProps, Edge, Node, OperationMode } from '@/app/page'
+import { ChildProps, Edge, Node, OperationMode } from '@/components/types'
 import { Button, Popover, Select, Table } from 'antd'
 import { ColumnProps } from 'antd/es/table'
 import Image from 'next/image'
