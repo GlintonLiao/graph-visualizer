@@ -249,6 +249,7 @@ export function Viewer({
                   >
                     <InputNumber
                       type='number'
+                      min={0}
                       className=''
                       bordered={false}
                       value={edge.value}
