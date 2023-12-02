@@ -135,9 +135,9 @@ export default function Home() {
       const sourceVisited = nodesMap[minEdge.sourceId].visited
       const targetVisited = nodesMap[minEdge.targetId].visited
 
-      // if (sourceVisited && targetVisited) {
-      //   continue // Skip this edge to avoid a cycle
-      // }
+      if (sourceVisited && targetVisited) {
+        continue // Skip this edge to avoid a cycle
+      }
 
       // mark the nodes as visited
       nodesMap[minEdge.sourceId].visited = true
@@ -157,6 +157,7 @@ export default function Home() {
 
       // update the MST
       selectedEdges.push(minEdge)
+      setTotalDistance((prev) => prev + minEdge.value)
 
       console.log(`Selected Edge: ${minEdge.sourceId} - ${minEdge.targetId}`)
       setEdges((prev) => ({

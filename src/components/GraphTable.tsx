@@ -101,7 +101,7 @@ export function GraphTable({
         size='small'
         columns={columns}
         pagination={false}
-        className='flex-1 shadow-lg rounded-lg p-2 pt-1 border overflow-scroll'
+        className='flex-1 shadow-lg rounded-lg p-2 pt-1 border overflow-auto'
         expandable={{
           expandedRowRender: (record: Node) => {
             const edgesForNode = Object.values(edges).filter(
