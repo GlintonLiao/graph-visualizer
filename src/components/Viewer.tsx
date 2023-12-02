@@ -235,6 +235,11 @@ export function Viewer({
                     setActiveNodeId(undefined)
                     setActiveEdgeId(edge.id)
                   }}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    setActiveNodeId(undefined)
+                    setActiveEdgeId(edge.id)
+                  }}
                 />
                 {activeEdgeId === edge.id ? (
                   <foreignObject
@@ -290,6 +295,11 @@ export function Viewer({
                 key={node.id}
                 className='group cursor-pointer'
                 onMouseDown={(e) => activeMoveEvent(e, node.id)}
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  setActiveNodeId(node.id)
+                  setActiveEdgeId(undefined)
+                }}
                 onClick={() => {
                   if (!activeNodeId) {
                     setActiveEdgeId(undefined)
