@@ -22,9 +22,6 @@ In summary, this graph visualization tool serves as an educational aid, a develo
     - **Styling:** Tailwind CSS classes, inline styles
     - **Visualization Libraries:** SVG for rendering graphs
     - **Async Operations:** Promises for delaying execution
-2. **File Structure and Components:**
-    - **Viewer Component:** Responsible for rendering the graph, handling node and edge interactions, and implementing algorithms.
-    - **GraphTable Component:** Not provided in the code block, but mentioned in the **`props`** object. Its functionality is not clear without the implementation.
     
 
 ### **Data Flow and Visualization:**
